@@ -7,4 +7,14 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="gary_white">#14FFFFFF</color>
+    <color name="background">#0B0E11</color>
+    <color name="balanced_card_color">#05FFFFFF</color>
+    <color name="text_card">#C1C6D7</color>
+    <color name="send_background">#1D202366</color>
+    <color name="res_color">#E1E2E7</color>
+    <color name="see_color">#ADC6FF</color>
+    <color name="image_background">#272A2E</color>
+    <color name="selected_item">#4B8EFF</color>
+    <color name="selected_icon">#00285C</color>
 </resources>

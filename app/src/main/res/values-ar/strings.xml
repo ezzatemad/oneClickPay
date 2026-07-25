@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">oneClickPay</string>
+    <string name="title_activity_dash_board">DashBoardActivity</string>
+    
+    
+    <string name="home">الرئيسية</string>
+    <string name="cards">الكروت</string>
+    <string name="transactions">التحويلات</string>
+</resources>

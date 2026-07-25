@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">oneClickPay</string>
+    <string name="title_activity_dash_board">DashBoardActivity</string>
+
+    <string name="home">Home</string>
+    <string name="cards">Cards</string>
+    <string name="transactions">Transactions</string>
 </resources>

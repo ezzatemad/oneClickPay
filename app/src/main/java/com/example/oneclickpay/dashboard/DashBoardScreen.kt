@@ -239,6 +239,7 @@ fun BalanceCard(
                 modifier = Modifier.padding(bottom = 12.dp, top = 12.dp)
             )
 
+
             Text(
                 text = "$24,354,651",
                 fontSize = 32.sp,

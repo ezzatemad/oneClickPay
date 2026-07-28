@@ -1,24 +1,35 @@
 package com.example.oneclickpay.dashboard
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,166 +44,184 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.domain.recenttranscations.model.recenttransaction.RecentTransactionModelItem
 import com.example.oneclickpay.R
-
+import com.example.oneclickpay.home.UserInfoStates
+import com.example.oneclickpay.home.UserInfoViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun DashBoardScreen() {
+fun DashBoardScreen(
+    modifier: Modifier = Modifier,
+    viewModel: DashBoardScreenViewModel = koinViewModel(),
+    userInfoViewModel: UserInfoViewModel = koinViewModel()
+) {
+    val uiState by viewModel.uiStates.collectAsStateWithLifecycle()
+    val userInfoState by userInfoViewModel.uiStates.collectAsStateWithLifecycle()
+
     var isExpanded by remember { mutableStateOf(false) }
 
     BackHandler(enabled = isExpanded) {
         isExpanded = false
     }
 
-    LazyColumn(
-        modifier = Modifier
+    val totalBalance = when (val state = userInfoState) {
+        is UserInfoStates.Success -> state.userInfoModel.balance.toString()
+        else -> null
+    }
+
+    Column(
+        modifier = modifier
             .fillMaxSize()
-            .background(color = colorResource(R.color.background)),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        contentPadding = PaddingValues(vertical = 16.dp)
+            .background(color = colorResource(R.color.background))
     ) {
-        if (isExpanded) {
-            item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "← Back",
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(4.dp))
-                            .clickable { isExpanded = false }
-                            .padding(8.dp)
-                    )
-                    Text(
-                        text = "All Transactions",
-                        color = colorResource(R.color.text_card),
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(start = 16.dp)
+        AnimatedVisibility(
+            visible = isExpanded,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = { isExpanded = false }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        tint = Color.White
                     )
                 }
-            }
-        } else {
-            item {
-                BalanceCard()
-            }
-
-            item {
-                SendButton(modifier = Modifier.padding(vertical = 8.dp))
-            }
-
-            item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Recent Transactions",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = colorResource(R.color.text_card),
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
-
-                    Text(
-                        text = "See All",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Normal,
-                        color = colorResource(R.color.see_color),
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(4.dp))
-                            .clickable { isExpanded = true } // Hides rest & shows 50 cards
-                            .padding(horizontal = 8.dp, vertical = 4.dp)
-                    )
-                }
+                Text(
+                    text = "All Transactions",
+                    color = colorResource(R.color.text_card),
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(start = 8.dp)
+                )
             }
         }
 
-        val itemCounter = if (isExpanded) 50 else 3
+        if (!isExpanded) {
+            BalanceCard(balance = totalBalance)
+            SendButton(
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(vertical = 8.dp),
+                onClick = { /* Handle Send Action */ }
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Recent Transactions",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = colorResource(R.color.text_card),
+                    modifier = Modifier.padding(start = 8.dp)
+                )
 
-        items(count = itemCounter) {
-            TransactionCard()
+                Text(
+                    text = "See All",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = colorResource(R.color.see_color),
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(4.dp))
+                        .clickable { isExpanded = true }
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                )
+            }
+        }
+
+        BoxWithConstraints(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+        ) {
+            when (val state = uiState) {
+                is DashBoardScreenStates.Idle -> {}
+
+                is DashBoardScreenStates.Loading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = Color.White)
+                    }
+                }
+
+                is DashBoardScreenStates.Error -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = state.errorMessage,
+                            color = Color.Red,
+                            fontSize = 14.sp
+                        )
+                    }
+                }
+
+                is DashBoardScreenStates.Success -> {
+                    val itemHeightDp = 76.dp
+                    val maxFitCount = (maxHeight / itemHeightDp).toInt().coerceAtLeast(1)
+
+                    val transactions = if (isExpanded) {
+                        state.recentTransaction
+                    } else {
+                        state.recentTransaction.take(maxFitCount)
+                    }
+
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        userScrollEnabled = isExpanded,
+                        contentPadding = PaddingValues(bottom = 16.dp)
+                    ) {
+                        items(
+                            items = transactions,
+                            key = { it.id }
+                        ) { transaction ->
+                            TransactionCard(transaction = transaction)
+                        }
+                    }
+                }
+            }
         }
     }
 }
-//@Composable
-//fun DashBoardScreen() {
-//
-//    var isExpanded by remember { mutableStateOf(false) }
-//
-//    BackHandler(enabled = isExpanded) {
-//        isExpanded = false
-//    }
-//
-//    Column(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .background(color = colorResource(R.color.background)),
-//        horizontalAlignment = Alignment.CenterHorizontally
-//    ) {
-//        BalanceCard()
-//
-//        SendButton()
-//
-//        Row(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(16.dp),
-//            horizontalArrangement = Arrangement.SpaceBetween,
-//            verticalAlignment = Alignment.CenterVertically
-//        ) {
-//            Text(
-//                text = "Recent Transactions",
-//                fontSize = 22.sp,
-//                fontWeight = FontWeight.Bold,
-//                color = colorResource(R.color.text_card),
-//                modifier = Modifier.padding(start = 8.dp)
-//            )
-//
-//            Text(
-//                text = "See All",
-//                fontSize = 14.sp,
-//                fontWeight = FontWeight.Normal,
-//                color = colorResource(R.color.see_color),
-//                modifier = Modifier.padding(end = 8.dp)
-//            )
-//
-//
-//        }
-//        TransactionCard()
-//
-//    }
-//}
 
 @Composable
 fun SendButton(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
 ) {
     Card(
         colors = CardDefaults.cardColors(containerColor = colorResource(R.color.balanced_card_color)),
         border = BorderStroke(
-            2.dp,
+            1.5.dp,
             color = colorResource(R.color.gary_white)
         ),
         shape = RoundedCornerShape(32.dp),
-        modifier = Modifier
-            .fillMaxWidth(.5f),
+        modifier = modifier
+            .fillMaxWidth(0.5f)
+            .clip(RoundedCornerShape(32.dp))
+            .clickable { onClick() }
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(vertical = 12.dp, horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
@@ -200,125 +229,151 @@ fun SendButton(
                 painter = painterResource(R.drawable.send_ic),
                 contentDescription = "Send Icon",
                 tint = Color.White,
-                modifier = Modifier.padding(end = 12.dp)
+                modifier = Modifier.padding(end = 8.dp)
             )
-            Text(text = "Send", fontSize = 16.sp, color = colorResource(R.color.text_card))
+            Text(
+                text = "Send",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = colorResource(R.color.text_card)
+            )
         }
     }
 }
 
 @Composable
 fun BalanceCard(
+    balance: String?,
     modifier: Modifier = Modifier
 ) {
     Card(
         colors = CardDefaults.cardColors(
-            containerColor = colorResource(R.color.balanced_card_color)
+            containerColor = colorResource(R.color.balanced_card_color),
+            contentColor = Color.White
         ),
         border = BorderStroke(
-            2.dp,
+            width = 1.5.dp,
             color = colorResource(R.color.gary_white)
         ),
         shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         modifier = modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(color = colorResource(R.color.balanced_card_color))
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(vertical = 20.dp, horizontal = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             Text(
                 text = "Total Balance",
                 color = colorResource(R.color.text_card),
-                fontSize = 18.sp,
-                modifier = Modifier.padding(bottom = 12.dp, top = 12.dp)
+                fontSize = 16.sp
             )
 
-
-            Text(
-                text = "$24,354,651",
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold,
-                color = colorResource(R.color.white),
-                modifier = Modifier.padding(top = 8.dp)
-            )
+            if (balance != null) {
+                Text(
+                    text = balance,
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            } else {
+                CircularProgressIndicator(
+                    color = Color.White,
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                        .size(24.dp),
+                    strokeWidth = 2.dp
+                )
+            }
         }
     }
 }
 
 @Composable
-fun TransactionCard() {
+fun TransactionCard(transaction: RecentTransactionModelItem) {
     Card(
         colors = CardDefaults.cardColors(containerColor = colorResource(R.color.balanced_card_color)),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .height(72.dp)
+            .padding(horizontal = 16.dp, vertical = 4.dp),
         border = BorderStroke(
-            width = 2.dp, color = colorResource(R.color.gary_white)
+            width = 1.dp,
+            color = colorResource(R.color.gary_white)
         ),
         shape = RoundedCornerShape(16.dp),
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
+                .fillMaxSize()
+                .padding(horizontal = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
-                painter = painterResource(R.drawable.trans_ic),
+                painter = painterResource(R.drawable.transaction_ic),
                 contentDescription = "Transaction Icon",
                 contentScale = ContentScale.Inside,
                 modifier = Modifier
-                    .size(52.dp)
+                    .size(44.dp)
                     .background(
                         color = colorResource(R.color.image_background).copy(alpha = 0.1f),
                         shape = CircleShape
                     )
                     .clip(CircleShape)
             )
-
             Column(
-                modifier = Modifier.padding(start = 12.dp)
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 12.dp)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Apple Store",
+                        text = transaction.description,
                         color = colorResource(R.color.text_card),
-                        fontSize = 16.sp,
+                        fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 4.dp)
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(end = 8.dp)
                     )
                     Text(
-                        text = "-1,299.00",
-                        fontSize = 16.sp,
+                        text = "${transaction.amount}",
+                        fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
                 }
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 2.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "2:45 PM • ",
-                            fontSize = 12.sp,
+                            text = "${transaction.date} • ",
+                            fontSize = 11.sp,
                             color = colorResource(R.color.text_card)
                         )
 
                         Text(
-                            text = "Electronics",
-                            fontSize = 12.sp,
+                            text = transaction.currency,
+                            fontSize = 11.sp,
                             color = colorResource(R.color.text_card),
                             modifier = Modifier.padding(end = 4.dp)
                         )
@@ -326,11 +381,11 @@ fun TransactionCard() {
                             painter = painterResource(R.drawable.icon),
                             contentDescription = "Category Icon",
                             tint = colorResource(R.color.text_card),
-                            modifier = Modifier.size(14.dp)
+                            modifier = Modifier.size(12.dp)
                         )
                     }
                     Text(
-                        text = "COMPLETED",
+                        text = transaction.state,
                         fontSize = 10.sp,
                         color = colorResource(R.color.text_card)
                     )

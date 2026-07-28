@@ -24,4 +24,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "oneClickPay"
 include(":app")
- 
+include(":domain")
+include(":data")

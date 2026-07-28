@@ -17,4 +17,5 @@
     <color name="image_background">#272A2E</color>
     <color name="selected_item">#4B8EFF</color>
     <color name="selected_icon">#00285C</color>
+    <color name="app_bar_color">#0B0E11</color>
 </resources>

@@ -55,4 +55,15 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+
+    implementation(project(":domain"))
+    implementation(project(":data"))
+
+    //koin
+    implementation("io.insert-koin:koin-android:4.2.2")
+    implementation("io.insert-koin:koin-androidx-compose:4.2.2")
+
+    implementation("io.coil-kt:coil-compose:2.7.0")
+
 }

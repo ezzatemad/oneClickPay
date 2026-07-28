@@ -149,9 +149,8 @@ fun HomeTopBar(
     uiState: UserInfoStates,
     borderColor: Color
 ) {
-    // استخراج اسم المستخدم والصورة بناءً على الـ State
     val userName = when (uiState) {
-        is UserInfoStates.Success -> uiState.userInfoModel.name // أو الحقل المناسب عندك في الموديل
+        is UserInfoStates.Success -> uiState.userInfoModel.name
         else -> ""
     }
 

@@ -3,8 +3,8 @@ package com.example.data.di
 
 import com.example.data.repoimpl.RecentTransactionsRepoImpl
 import com.example.data.repoimpl.UserInfoRepoImpl
-import com.example.domain.recenttranscations.repo.recenttransactionrepo.RecentTransactionRepo
-import com.example.domain.recenttranscations.repo.userinfo.UserInfoRepo
+import com.example.domain.recenttranscations.repo.RecentTransactionRepo
+import com.example.domain.recenttranscations.repo.UserInfoRepo
 import org.koin.dsl.module
 
 

@@ -1,14 +1,14 @@
 package com.example.domain.recenttranscations.usecase
 
-import com.example.domain.recenttranscations.model.userinfo.UserInfoModel
-import com.example.domain.recenttranscations.repo.userinfo.UserInfoRepo
+import com.example.domain.recenttranscations.model.UserInfo
+import com.example.domain.recenttranscations.repo.UserInfoRepo
+import com.example.domain.recenttranscations.utils.Resource
 
 class UserInfoUseCase(
-    val userInfoRepo: UserInfoRepo
+    private val userInfoRepo: UserInfoRepo
 ) {
 
-    suspend fun getUserInfoUseCase(identifier: String): UserInfoModel {
-
+    suspend operator fun invoke(identifier: String): Resource<UserInfo> {
         return userInfoRepo.getUserInfo(identifier)
     }
 

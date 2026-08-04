@@ -2,6 +2,7 @@ package com.example.oneclickpay.home
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -12,7 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,6 +29,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -44,6 +48,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.oneclickpay.R
+import com.example.oneclickpay.card.Cards
 import com.example.oneclickpay.dashboard.DashBoardScreen
 import com.example.oneclickpay.ui.theme.OneClickPayTheme
 import org.koin.compose.viewmodel.koinViewModel
@@ -64,12 +69,39 @@ class DashBoardActivity : ComponentActivity() {
 fun HomeActivity(
     borderColor: Color, viewModel: UserInfoViewModel = koinViewModel()
 ) {
-
     val uiState by viewModel.uiStates.collectAsStateWithLifecycle()
 
     var selectedIndex by remember { mutableIntStateOf(0) }
+    var isExpanded by remember { mutableStateOf(false) }
+
+    BackHandler(enabled = selectedIndex != 0 || isExpanded) {
+        if (isExpanded) {
+            isExpanded = false
+        } else {
+            selectedIndex = 0
+        }
+    }
+
     Scaffold(
-        topBar = { HomeTopBar(borderColor = borderColor, uiState = uiState) },
+        topBar = {
+            when {
+                selectedIndex == 1 -> {
+                    CardsTopBar(
+                        borderColor = borderColor,
+                        onBackClick = { selectedIndex = 0 }
+                    )
+                }
+                selectedIndex == 0 && isExpanded -> {
+                    AllTransactionsTopBar(
+                        borderColor = borderColor,
+                        onBackClick = { isExpanded = false }
+                    )
+                }
+                else -> {
+                    HomeTopBar(borderColor = borderColor, uiState = uiState)
+                }
+            }
+        },
         bottomBar = {
             NavigationBar(
                 containerColor = colorResource(R.color.background),
@@ -91,7 +123,10 @@ fun HomeActivity(
                 )
                 NavigationBarItem(
                     selected = selectedIndex == 0,
-                    onClick = { selectedIndex = 0 },
+                    onClick = {
+                        selectedIndex = 0
+                        isExpanded = false
+                    },
                     icon = {
                         Icon(
                             painter = painterResource(R.drawable.home_ic),
@@ -133,14 +168,95 @@ fun HomeActivity(
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .background(color = colorResource(R.color.background))
                 .padding(innerPadding),
             contentAlignment = Alignment.Center
         ) {
             when (selectedIndex) {
-                0 -> DashBoardScreen()
+                0 -> DashBoardScreen(
+                    isExpanded = isExpanded,
+                    onExpandedChange = { isExpanded = it }
+                )
+                1 -> Cards()
             }
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CardsTopBar(
+    borderColor: Color,
+    onBackClick: () -> Unit
+) {
+    CenterAlignedTopAppBar(
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+            containerColor = colorResource(R.color.app_bar_color),
+        ),
+        modifier = Modifier.drawBehind {
+            drawLine(
+                color = borderColor,
+                start = Offset(0f, size.height),
+                end = Offset(size.width, size.height),
+                strokeWidth = 2.dp.toPx()
+            )
+        },
+        title = {
+            Text(
+                text = "NexusPay",
+                color = Color.White,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        navigationIcon = {
+            IconButton(onClick = onBackClick) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = Color.White
+                )
+            }
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AllTransactionsTopBar(
+    borderColor: Color,
+    onBackClick: () -> Unit
+) {
+    TopAppBar(
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = colorResource(R.color.app_bar_color),
+        ),
+        modifier = Modifier.drawBehind {
+            drawLine(
+                color = borderColor,
+                start = Offset(0f, size.height),
+                end = Offset(size.width, size.height),
+                strokeWidth = 2.dp.toPx()
+            )
+        },
+        title = {
+            Text(
+                text = "All Transactions",
+                color = Color.White,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        navigationIcon = {
+            IconButton(onClick = onBackClick) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = Color.White
+                )
+            }
+        }
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

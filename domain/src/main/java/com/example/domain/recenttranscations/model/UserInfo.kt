@@ -1,6 +1,6 @@
-package com.example.domain.recenttranscations.model.userinfo
+package com.example.domain.recenttranscations.model
 
-data class UserInfoModel(
+data class UserInfo(
     val avatar: String,
     val balance: Int,
     val currency: String,

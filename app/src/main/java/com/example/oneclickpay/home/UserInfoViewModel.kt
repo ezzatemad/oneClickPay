@@ -3,10 +3,8 @@ package com.example.oneclickpay.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.composereview.mainascreen.Constants
-import com.example.domain.recenttranscations.usecase.RecentTransactionUseCase
 import com.example.domain.recenttranscations.usecase.UserInfoUseCase
-import com.example.oneclickpay.dashboard.DashBoardScreenIntent
-import com.example.oneclickpay.dashboard.DashBoardScreenStates
+import com.example.domain.recenttranscations.utils.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,7 +18,7 @@ class UserInfoViewModel(private val userInfoUseCase: UserInfoUseCase) :
 
 
     init {
-        processIntent(UserInfoIntent.LoadUserProfile(Constants.PHONE_IDENDIFER))
+        processIntent(UserInfoIntent.LoadUserProfile(Constants.PHONE_IDENTIFIER))
     }
 
     fun processIntent(intent: UserInfoIntent) {
@@ -34,14 +32,20 @@ class UserInfoViewModel(private val userInfoUseCase: UserInfoUseCase) :
 
     private fun fetchUserInfo(phoneNumber: String) {
         viewModelScope.launch {
-            try {
-                val userInfo = userInfoUseCase.getUserInfoUseCase(phoneNumber)
-                _uiStates.value = UserInfoStates.Success(userInfo)
-            } catch (e: Exception) {
-                _uiStates.value =
-                    UserInfoStates.Error(e.localizedMessage ?: "حدث خطأ أثناء تحميل البيانات")
-            }
+            _uiStates.value = UserInfoStates.Loading
+            when (val result = userInfoUseCase(phoneNumber)) {
+                is Resource.Success -> {
+                    _uiStates.value = UserInfoStates.Success(result.data)
+                }
 
+                is Resource.Error -> {
+                    _uiStates.value = UserInfoStates.Error(result.message)
+                }
+
+                is Resource.Loading -> {
+                    _uiStates.value = UserInfoStates.Loading
+                }
+            }
         }
     }
 }

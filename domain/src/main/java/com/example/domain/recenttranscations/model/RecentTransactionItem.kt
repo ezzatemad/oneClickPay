@@ -1,6 +1,6 @@
-package com.example.domain.recenttranscations.model.recenttransaction
+package com.example.domain.recenttranscations.model
 
-data class RecentTransactionModelItem(
+data class RecentTransactionItem(
     val amount: Int,
     val currency: String,
     val date: String,

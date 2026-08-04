@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.composereview.mainascreen.Constants
 import com.example.domain.recenttranscations.usecase.RecentTransactionUseCase
+import com.example.domain.recenttranscations.utils.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,7 +18,7 @@ class DashBoardScreenViewModel(private val recentTransactionUseCase: RecentTrans
 
 
     init {
-        processIntent(DashBoardScreenIntent.LoadTransactions(Constants.PHONE_IDENDIFER))
+        processIntent(DashBoardScreenIntent.LoadTransactions(Constants.PHONE_IDENTIFIER))
     }
 
     fun processIntent(intent: DashBoardScreenIntent) {
@@ -32,13 +33,18 @@ class DashBoardScreenViewModel(private val recentTransactionUseCase: RecentTrans
     private fun fetchTransactions(phoneNumber: String) {
         viewModelScope.launch {
             _uiStates.value = DashBoardScreenStates.Loading
-            try {
-                val transactionList =
-                    recentTransactionUseCase.getAllTransactionsUseCase(phoneNumber)
-                _uiStates.value = DashBoardScreenStates.Success(transactionList)
-            } catch (e: Exception) {
-                _uiStates.value =
-                    DashBoardScreenStates.Error(e.localizedMessage ?: "حدث خطأ غير متوقع")
+            when (val result = recentTransactionUseCase(phoneNumber)) {
+                is Resource.Success -> {
+                    _uiStates.value = DashBoardScreenStates.Success(result.data)
+                }
+
+                is Resource.Error -> {
+                    _uiStates.value = DashBoardScreenStates.Error(result.message)
+                }
+
+                is Resource.Loading -> {
+                    _uiStates.value = DashBoardScreenStates.Loading
+                }
             }
         }
     }

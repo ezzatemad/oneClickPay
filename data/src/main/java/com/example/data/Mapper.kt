@@ -2,11 +2,11 @@ package com.example.data
 
 import com.example.data.dto.RecentTransactionDto
 import com.example.data.dto.UserInfoDto
-import com.example.domain.recenttranscations.model.recenttransaction.RecentTransactionModelItem
-import com.example.domain.recenttranscations.model.userinfo.UserInfoModel
+import com.example.domain.recenttranscations.model.RecentTransactionItem
+import com.example.domain.recenttranscations.model.UserInfo
 
-fun RecentTransactionDto.toDomain(): RecentTransactionModelItem {
-    return RecentTransactionModelItem(
+fun RecentTransactionDto.toDomain(): RecentTransactionItem {
+    return RecentTransactionItem(
         amount = amount,
         currency = currency,
         date = date,
@@ -18,8 +18,8 @@ fun RecentTransactionDto.toDomain(): RecentTransactionModelItem {
     )
 }
 
-fun UserInfoDto.toDomain(): UserInfoModel {
-    return UserInfoModel(
+fun UserInfoDto.toDomain(): UserInfo {
+    return UserInfo(
         avatar = avatar,
         balance = balance,
         currency = currency,

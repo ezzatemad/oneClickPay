@@ -1,13 +1,12 @@
 package com.example.domain.recenttranscations.usecase
 
-import com.example.domain.recenttranscations.model.recenttransaction.RecentTransactionModelItem
-import com.example.domain.recenttranscations.repo.recenttransactionrepo.RecentTransactionRepo
+import com.example.domain.recenttranscations.model.RecentTransactionItem
+import com.example.domain.recenttranscations.repo.RecentTransactionRepo
+import com.example.domain.recenttranscations.utils.Resource
 
-class RecentTransactionUseCase(val recentTransactionRepo: RecentTransactionRepo) {
+class RecentTransactionUseCase(private val recentTransactionRepo: RecentTransactionRepo) {
 
-
-    suspend fun getAllTransactionsUseCase(identifier: String): List<RecentTransactionModelItem> {
-
+    suspend operator fun invoke(identifier: String): Resource<List<RecentTransactionItem>> {
         return recentTransactionRepo.getAllRecentTransactions(identifier)
     }
 }

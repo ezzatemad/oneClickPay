@@ -11,7 +11,7 @@ import org.koin.dsl.module
 val repositoryModule = module {
 
     single<RecentTransactionRepo> {
-        RecentTransactionsRepoImpl(get())
+        RecentTransactionsRepoImpl(get(), get())
     }
 
     single<UserInfoRepo> {

@@ -50,6 +50,7 @@ import coil.compose.AsyncImage
 import com.example.oneclickpay.R
 import com.example.oneclickpay.card.Cards
 import com.example.oneclickpay.dashboard.DashBoardScreen
+import com.example.oneclickpay.transactions.TransactionsScreen
 import com.example.oneclickpay.ui.theme.OneClickPayTheme
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -91,12 +92,14 @@ fun HomeActivity(
                         onBackClick = { selectedIndex = 0 }
                     )
                 }
+
                 selectedIndex == 0 && isExpanded -> {
                     AllTransactionsTopBar(
                         borderColor = borderColor,
                         onBackClick = { isExpanded = false }
                     )
                 }
+
                 else -> {
                     HomeTopBar(borderColor = borderColor, uiState = uiState)
                 }
@@ -170,14 +173,15 @@ fun HomeActivity(
                 .fillMaxSize()
                 .background(color = colorResource(R.color.background))
                 .padding(innerPadding),
-            contentAlignment = Alignment.Center
         ) {
             when (selectedIndex) {
                 0 -> DashBoardScreen(
                     isExpanded = isExpanded,
                     onExpandedChange = { isExpanded = it }
                 )
+
                 1 -> Cards()
+                2 -> TransactionsScreen()
             }
         }
     }

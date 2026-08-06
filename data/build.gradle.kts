@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     kotlin("plugin.serialization")
-
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -53,13 +53,12 @@ dependencies {
     implementation("io.insert-koin:koin-android:4.2.2")
     implementation("io.insert-koin:koin-androidx-compose:4.2.2")
 
-//    implementation("com.squareup.okhttp3:okhttp:5.4.0")
 
     implementation("io.ktor:ktor-client-okhttp:3.5.1")
 
+    val roomVersion = "2.8.4"
 
-
-
-
-
+    implementation("androidx.room:room-runtime:$roomVersion")
+    implementation("androidx.room:room-ktx:$roomVersion")
+    ksp("androidx.room:room-compiler:$roomVersion")
 }

@@ -15,7 +15,7 @@ val repositoryModule = module {
     }
 
     single<UserInfoRepo> {
-        UserInfoRepoImpl(get())
+        UserInfoRepoImpl(get(), get())
     }
 
 }

@@ -1,6 +1,7 @@
 package com.example.data
 
 import com.example.data.db.entities.RecentTransactionEntity
+import com.example.data.db.entities.UserInfoEntity
 import com.example.data.dto.RecentTransactionDto
 import com.example.data.dto.UserInfoDto
 import com.example.domain.recenttranscations.model.RecentTransactionItem
@@ -33,6 +34,7 @@ fun RecentTransactionEntity.toDomain(): RecentTransactionItem {
         type = type
     )
 }
+
 fun RecentTransactionDto.toDomain(): RecentTransactionItem {
     return RecentTransactionItem(
         amount = amount,
@@ -46,12 +48,28 @@ fun RecentTransactionDto.toDomain(): RecentTransactionItem {
     )
 }
 
-fun UserInfoDto.toDomain(): UserInfo {
-    return UserInfo(
+
+
+
+// DTO -> Entity
+fun UserInfoDto.toEntity(): UserInfoEntity {
+    return UserInfoEntity(
+        id = id,
         avatar = avatar,
         balance = balance,
         currency = currency,
+        identifier = identifier,
+        name = name
+    )
+}
+
+// Entity -> Domain Model
+fun UserInfoEntity.toDomain(): UserInfo {
+    return UserInfo(
         id = id,
+        avatar = avatar,
+        balance = balance,
+        currency = currency,
         identifier = identifier,
         name = name
     )

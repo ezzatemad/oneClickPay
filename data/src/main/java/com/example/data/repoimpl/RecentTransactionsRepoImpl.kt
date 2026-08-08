@@ -13,8 +13,7 @@ import io.ktor.client.plugins.ServerResponseException
 class RecentTransactionsRepoImpl(
     private val recentTransactionApi: RecentTransactionApi,
     private val transactionDao: TransactionDao
-) :
-    RecentTransactionRepo {
+) : RecentTransactionRepo {
 
     override suspend fun getAllRecentTransactions(identifier: String): Resource<List<RecentTransactionItem>> {
 
@@ -25,11 +24,16 @@ class RecentTransactionsRepoImpl(
             transactionDao.clearTransactions()
             transactionDao.insertTransactions(entities)
 
-            val localData = transactionDao.getAllTransactions().map { it.toDomain() }
-            Resource.Success(localData)
-        } catch (e: Exception) {
-            val localData = transactionDao.getAllTransactions().map { it.toDomain() }
+            val sortedList = remoteResponse
+                .map { it.toDomain() }
+                .sortedByDescending { it.date }
 
+            Resource.Success(sortedList)
+
+        } catch (e: Exception) {
+            val localData = transactionDao.getAllTransactions()
+                .map { it.toDomain() }
+                .sortedByDescending { it.date }
             if (localData.isNotEmpty()) {
                 Resource.Success(localData)
             } else {

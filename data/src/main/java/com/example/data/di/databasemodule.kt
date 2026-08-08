@@ -15,4 +15,6 @@ val databaseModule = module {
     }
 
     single { get<AppDatabase>().transactionDao() }
+    single { get<AppDatabase>().userInfoDao() }
+
 }

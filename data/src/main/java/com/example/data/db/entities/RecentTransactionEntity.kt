@@ -12,5 +12,6 @@ data class RecentTransactionEntity(
     val time: String,
     val description: String,
     val state: String,
-    val type: String
+    val type: String,
+    val isSynced: Boolean = true
 )

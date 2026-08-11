@@ -65,4 +65,8 @@ dependencies {
     implementation("androidx.paging:paging-runtime:3.5.0")
     implementation("androidx.paging:paging-compose:3.5.0")
 
+
+    val workVersion = "2.11.2"
+    implementation("androidx.work:work-runtime-ktx:$workVersion")
+
 }

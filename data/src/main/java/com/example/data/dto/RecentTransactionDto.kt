@@ -11,5 +11,6 @@ data class RecentTransactionDto (
     val id: Int,
     val state: String,
     val time: String,
-    val type: String
+    val type: String,
+    val isSynced: Boolean = true
 )

@@ -12,7 +12,7 @@ import com.example.domain.recenttranscations.model.UserInfo
 interface UserInfoDao {
 
     @Query("SELECT * FROM user_info LIMIT 1")
-    suspend fun getUserInfo(): UserInfo
+    suspend fun getUserInfo(): UserInfoEntity
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertUserInfo(userInfoEntity: UserInfoEntity)

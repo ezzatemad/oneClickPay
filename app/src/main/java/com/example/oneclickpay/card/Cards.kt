@@ -47,10 +47,10 @@ fun Cards() {
     var cardHolderName by remember { mutableStateOf("") }
     var expiryDate by remember { mutableStateOf("") }
     var cvv by remember { mutableStateOf("") }
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .background(color = colorResource(R.color.background))
             .padding(12.dp)
             .verticalScroll(rememberScrollState())
     ) {

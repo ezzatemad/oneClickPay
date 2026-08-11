@@ -2,14 +2,7 @@ package com.example.data.worker
 
 import android.content.Context
 import android.util.Log
-import androidx.work.BackoffPolicy
-import androidx.work.Constraints
 import androidx.work.CoroutineWorker
-import androidx.work.Data
-import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.example.composereview.mainascreen.Constants
 import com.example.data.apiservices.RecentTransactionApi
@@ -17,9 +10,8 @@ import com.example.data.db.dao.TransactionDao
 import com.example.data.toEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.util.concurrent.TimeUnit
 
-class DataSyncWorker(
+class TransactionSyncWorker(
     context: Context,
     workerParameters: WorkerParameters,
     private val transactionDao: TransactionDao,

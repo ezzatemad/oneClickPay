@@ -12,7 +12,7 @@ import com.example.data.apiservices.RecentTransactionApi
 import com.example.data.db.dao.TransactionDao
 import com.example.data.toDomain
 import com.example.data.toEntity
-import com.example.data.worker.DataSyncWorker
+import com.example.data.worker.TransactionSyncWorker
 import com.example.domain.recenttranscations.model.RecentTransactionItem
 import com.example.domain.recenttranscations.repo.RecentTransactionRepo
 import com.example.domain.recenttranscations.utils.Resource
@@ -35,18 +35,21 @@ class RecentTransactionsRepoImpl(
             transactionDao.clearTransactions()
             transactionDao.insertTransactions(entities)
 
-            val sortedList = remoteResponse
+//            val sortedList = remoteResponse
+//                .map { it.toDomain() }
+//                .sortedByDescending { it.date }
+            val localData = transactionDao.getAllTransactions()
                 .map { it.toDomain() }
                 .sortedByDescending { it.date }
 
-            Resource.Success(sortedList)
+            Resource.Success(localData)
 
         } catch (e: Exception) {
             val localData = transactionDao.getAllTransactions()
                 .map { it.toDomain() }
                 .sortedByDescending { it.date }
 
-            scheduleBackgroundSync(identifier)
+            scheduleTransactionSync(identifier)
 
             if (localData.isNotEmpty()) {
                 Resource.Success(localData)
@@ -60,7 +63,7 @@ class RecentTransactionsRepoImpl(
             }
         }
     }
-    private fun scheduleBackgroundSync(identifier: String) {
+     private fun scheduleTransactionSync(identifier: String) {
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.UNMETERED)
             .build()
@@ -69,7 +72,7 @@ class RecentTransactionsRepoImpl(
             .putString("IDENTIFIER", identifier)
             .build()
 
-        val syncWorkRequest = OneTimeWorkRequestBuilder<DataSyncWorker>()
+        val syncWorkRequest = OneTimeWorkRequestBuilder<TransactionSyncWorker>()
             .setConstraints(constraints)
             .setInputData(inputData)
             .setBackoffCriteria(
@@ -80,7 +83,7 @@ class RecentTransactionsRepoImpl(
             .build()
 
         WorkManager.getInstance(context).enqueueUniqueWork(
-            DataSyncWorker.WORK_NAME,
+            TransactionSyncWorker.WORK_NAME,
             ExistingWorkPolicy.REPLACE,
             syncWorkRequest
         )

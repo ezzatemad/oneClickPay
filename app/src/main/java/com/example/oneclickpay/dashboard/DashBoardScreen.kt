@@ -52,7 +52,8 @@ fun DashBoardScreen(
     isExpanded: Boolean = false,
     onExpandedChange: (Boolean) -> Unit = {},
     viewModel: DashBoardScreenViewModel = koinViewModel(),
-    userInfoViewModel: UserInfoViewModel = koinViewModel()
+    userInfoViewModel: UserInfoViewModel = koinViewModel(),
+    onClick: () -> Unit = {}
 ) {
     MonitorWorkStatus(context = LocalContext.current)
 
@@ -79,7 +80,7 @@ fun DashBoardScreen(
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .padding(vertical = 8.dp),
-                onClick = { /* Handle Send Action */ }
+                onClick = { onClick() }
             )
             Row(
                 modifier = Modifier

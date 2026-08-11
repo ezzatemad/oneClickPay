@@ -7,14 +7,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import com.example.data.worker.DataSyncWorker
+import com.example.data.worker.TransactionSyncWorker
 
 
 // For monitor Worker Status
 @Composable
 fun MonitorWorkStatus(context: Context) {
     val workInfos by WorkManager.getInstance(context)
-        .getWorkInfosForUniqueWorkLiveData(DataSyncWorker.WORK_NAME)
+        .getWorkInfosForUniqueWorkLiveData(TransactionSyncWorker.WORK_NAME)
         .observeAsState()
 
     val workInfo = workInfos?.firstOrNull()

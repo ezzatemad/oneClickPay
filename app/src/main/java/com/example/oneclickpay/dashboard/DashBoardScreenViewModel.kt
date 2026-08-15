@@ -8,6 +8,7 @@ import com.example.domain.recenttranscations.utils.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class DashBoardScreenViewModel(private val recentTransactionUseCase: RecentTransactionUseCase) :
@@ -32,18 +33,22 @@ class DashBoardScreenViewModel(private val recentTransactionUseCase: RecentTrans
 
     private fun fetchTransactions(phoneNumber: String) {
         viewModelScope.launch {
-            _uiStates.value = DashBoardScreenStates.Loading
-            when (val result = recentTransactionUseCase(phoneNumber)) {
-                is Resource.Success -> {
-                    _uiStates.value = DashBoardScreenStates.Success(result.data)
-                }
+            // الاستماع للـ Flow التفاعلي المبعوث من UseCase / Repository
+            recentTransactionUseCase(phoneNumber).collectLatest { result ->
+                when (result) {
+                    is Resource.Success -> {
+                        _uiStates.value = DashBoardScreenStates.Success(result.data)
+                    }
 
-                is Resource.Error -> {
-                    _uiStates.value = DashBoardScreenStates.Error(result.message)
-                }
+                    is Resource.Error -> {
+                        _uiStates.value = DashBoardScreenStates.Error(
+                            result.message ?: "Unknown error occurred"
+                        )
+                    }
 
-                is Resource.Loading -> {
-                    _uiStates.value = DashBoardScreenStates.Loading
+                    is Resource.Loading -> {
+                        _uiStates.value = DashBoardScreenStates.Loading
+                    }
                 }
             }
         }

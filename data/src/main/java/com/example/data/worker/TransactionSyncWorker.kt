@@ -31,7 +31,7 @@ class TransactionSyncWorker(
             val entities = remoteData.map { it.toEntity() }
 
             // update local database
-            transactionDao.clearTransactions()
+            transactionDao.clearSyncedTransactions()
             transactionDao.insertTransactions(entities)
 
 //            Log.d("WorkManager", "Sync succeeded for identifier: ${Constants.PHONE_IDENTIFIER}")

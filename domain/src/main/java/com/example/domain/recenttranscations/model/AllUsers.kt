@@ -1,9 +1,7 @@
 package com.example.domain.recenttranscations.model
 
-data class UserInfo(
+data class AllUsers(
     val avatar: String,
-    val balance: Double,
-    val currency: String,
     val id: Int,
     val identifier: String,
     val name: String

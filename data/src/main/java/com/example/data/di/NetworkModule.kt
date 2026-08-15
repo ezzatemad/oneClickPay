@@ -1,6 +1,9 @@
 package com.example.data.di
+
 import com.example.composereview.mainascreen.Constants
+import com.example.data.apiservices.AllUsersApi
 import com.example.data.apiservices.RecentTransactionApi
+import com.example.data.apiservices.SendMoneyApi
 import com.example.data.apiservices.UserInfoApi
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
@@ -37,6 +40,13 @@ val networkModule = module {
 
     single {
         UserInfoApi(get())
+    }
+
+    single {
+        SendMoneyApi(get())
+    }
+    single {
+        AllUsersApi(get())
     }
 }
 

@@ -18,6 +18,11 @@ import com.example.domain.recenttranscations.repo.RecentTransactionRepo
 import com.example.domain.recenttranscations.utils.Resource
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.ServerResponseException
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import java.util.concurrent.TimeUnit
 
 class RecentTransactionsRepoImpl(
@@ -26,46 +31,42 @@ class RecentTransactionsRepoImpl(
     private val context: Context
 ) : RecentTransactionRepo {
 
-    override suspend fun getAllRecentTransactions(identifier: String): Resource<List<RecentTransactionItem>> {
+    override suspend fun getAllRecentTransactions(identifier: String): Flow<Resource<List<RecentTransactionItem>>> =
+        flow {
+            emit(Resource.Loading)
 
-        return try {
-            val remoteResponse = recentTransactionApi.getAllRecentTransactionApi(identifier)
-            val entities = remoteResponse.map { it.toEntity() }
+            try {
+                val remoteResponse = recentTransactionApi.getAllRecentTransactionApi(identifier)
+                val entities = remoteResponse.map { it.toEntity() }
 
-            transactionDao.clearTransactions()
-            transactionDao.insertTransactions(entities)
+                transactionDao.clearSyncedTransactions()
+                transactionDao.insertTransactions(entities)
 
-//            val sortedList = remoteResponse
-//                .map { it.toDomain() }
-//                .sortedByDescending { it.date }
-            val localData = transactionDao.getAllTransactions()
-                .map { it.toDomain() }
-                .sortedByDescending { it.date }
+            } catch (e: Exception) {
+                scheduleTransactionSync(identifier)
 
-            Resource.Success(localData)
-
-        } catch (e: Exception) {
-            val localData = transactionDao.getAllTransactions()
-                .map { it.toDomain() }
-                .sortedByDescending { it.date }
-
-            scheduleTransactionSync(identifier)
-
-            if (localData.isNotEmpty()) {
-                Resource.Success(localData)
-            } else {
-                val errorMessage = when (e) {
-                    is ClientRequestException -> "Error in order data: ${e.response.status.value}"
-                    is ServerResponseException -> "Server error: ${e.response.status.value}"
-                    else -> "No internet connection and no cached data available."
+                val localList = transactionDao.getAllTransactions().first()
+                if (localList.isEmpty()) {
+                    val errorMessage = when (e) {
+                        is ClientRequestException -> "Error in order data: ${e.response.status.value}"
+                        is ServerResponseException -> "Server error: ${e.response.status.value}"
+                        else -> "No internet connection and no cached data available."
+                    }
+                    emit(Resource.Error(errorMessage, e))
                 }
-                Resource.Error(errorMessage, e)
             }
+
+            val localFlow = transactionDao.getAllTransactionsFlow().map { list ->
+                val mappedList = list.map { it.toDomain() }
+                Resource.Success(mappedList)
+            }
+
+            emitAll(localFlow)
         }
-    }
-     private fun scheduleTransactionSync(identifier: String) {
+
+    private fun scheduleTransactionSync(identifier: String) {
         val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.UNMETERED)
+            .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
         val inputData = Data.Builder()
@@ -89,9 +90,3 @@ class RecentTransactionsRepoImpl(
         )
     }
 }
-
-
-
-
-
-

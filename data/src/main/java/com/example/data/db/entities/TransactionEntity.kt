@@ -3,10 +3,10 @@ package com.example.data.db.entities
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "recent_transactions")
-data class RecentTransactionEntity(
-    @PrimaryKey val id: Int,
-    val amount: Int,
+@Entity(tableName = "transactions")
+data class TransactionEntity(
+    @PrimaryKey  val id: String,
+    val amount: Double,
     val currency: String,
     val date: String,
     val time: String,

@@ -1,5 +1,6 @@
 package com.example.data
 
+import com.example.data.db.entities.MyCardEntity
 import com.example.data.db.entities.AllUsersEntity
 import com.example.data.db.entities.TransactionEntity
 import com.example.data.db.entities.UserInfoEntity
@@ -7,6 +8,7 @@ import com.example.data.dto.AllUserDto
 import com.example.data.dto.RecentTransactionDto
 import com.example.data.dto.UserInfoDto
 import com.example.data.dto.SendMoneyRequestDto
+import com.example.domain.recenttranscations.model.AddCard
 import com.example.domain.recenttranscations.model.AllUsers
 import com.example.domain.recenttranscations.model.RecentTransactionItem
 import com.example.domain.recenttranscations.model.UserInfo
@@ -14,6 +16,26 @@ import com.example.domain.recenttranscations.model.SendMoneyRequest
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+
+fun AddCard.toEntity(id: String): MyCardEntity {
+    return MyCardEntity(
+        id = id,
+        cardNumber = cardNumber,
+        cardName = cardName,
+        expiryDate = expiryDate,
+        cvv = cvv
+    )
+}
+
+
+fun MyCardEntity.toDomain(): AddCard {
+    return AddCard(
+        cardNumber = cardNumber,
+        cardName = cardName,
+        expiryDate = expiryDate,
+        cvv = cvv,
+    )
+}
 
 fun AllUserDto.toEntity(): AllUsersEntity {
     return AllUsersEntity(

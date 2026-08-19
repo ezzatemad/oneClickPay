@@ -35,4 +35,7 @@ interface TransactionDao {
     @Query("UPDATE transactions SET state = :state, isSynced = :isSynced WHERE id = :id")
     suspend fun updateTransactionStatus(id: String, state: String, isSynced: Boolean)
 
+    @Query("SELECT * FROM transactions WHERE isSynced = 0 AND state = 'PENDING'")
+    suspend fun getPendingTransactions(): List<TransactionEntity>
+
 }

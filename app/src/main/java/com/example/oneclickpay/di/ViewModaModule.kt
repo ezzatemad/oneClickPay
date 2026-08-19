@@ -1,5 +1,7 @@
 package com.example.oneclickpay.di
 
+import com.example.oneclickpay.card.addnewcard.CardViewModel
+import com.example.oneclickpay.card.allcard.MyCardsViewModel
 import com.example.oneclickpay.dashboard.DashBoardScreenViewModel
 import com.example.oneclickpay.home.UserInfoViewModel
 import com.example.oneclickpay.sendmoney.SendMoneyViewModel
@@ -19,5 +21,12 @@ val viewModalModule = module {
 
     viewModel {
         SendMoneyViewModel(get(),get())
+    }
+
+    viewModel {
+        CardViewModel(get())
+    }
+    viewModel {
+        MyCardsViewModel(get())
     }
 }

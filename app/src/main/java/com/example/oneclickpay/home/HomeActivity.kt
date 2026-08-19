@@ -7,7 +7,6 @@ import androidx.activity.compose.setContent
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -54,7 +53,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.oneclickpay.R
-import com.example.oneclickpay.card.Cards
+import com.example.oneclickpay.card.addnewcard.CardsScreen
+import com.example.oneclickpay.card.allcard.MyCardsScreen
 import com.example.oneclickpay.dashboard.DashBoardScreen
 import com.example.oneclickpay.sendmoney.SendMoneyScreen
 import com.example.oneclickpay.transactions.TransactionsScreen
@@ -105,7 +105,8 @@ fun HomeActivity(
                         navigationIcon = { BackButton { navController.popBackStack() } }
                     )
                 }
-                currentRoute == ScreenRoute.Cards.route -> {
+
+                currentRoute == ScreenRoute.MyCard.route -> {
                     AppBaseTopBar(
                         title = { TopBarTitle("NexusPay") },
                         borderColor = borderColor,
@@ -113,6 +114,7 @@ fun HomeActivity(
                         navigationIcon = { BackButton { navController.popBackStack() } }
                     )
                 }
+
                 currentRoute == ScreenRoute.Dashboard.route && isExpanded -> {
                     AppBaseTopBar(
                         title = { TopBarTitle("All Transactions", fontSize = 20.sp) },
@@ -120,6 +122,7 @@ fun HomeActivity(
                         navigationIcon = { BackButton { isExpanded = false } }
                     )
                 }
+
                 else -> {
                     HomeTopBar(uiState = uiState, borderColor = borderColor)
                 }
@@ -152,7 +155,11 @@ fun HomeActivity(
                     onClick = { navController.navigate(ScreenRoute.Transfer.route) }
                 )
             }
-            composable(ScreenRoute.Cards.route) { Cards() }
+            composable(ScreenRoute.MyCard.route) {
+                MyCardsScreen(
+                    onAddNewCardClick = { navController.navigate(ScreenRoute.Cards.route) }
+                )
+            }
             composable(ScreenRoute.Transactions.route) { TransactionsScreen() }
             composable(ScreenRoute.Transfer.route) {
                 SendMoneyScreen(
@@ -161,6 +168,7 @@ fun HomeActivity(
                     }
                 )
             }
+            composable(ScreenRoute.Cards.route) { CardsScreen() }
         }
     }
 }
@@ -280,9 +288,10 @@ data class BottomNavItem(
 
 val bottomNavItems = listOf(
     BottomNavItem(ScreenRoute.Dashboard.route, R.drawable.home_ic, R.string.home),
-    BottomNavItem(ScreenRoute.Cards.route, R.drawable.card_ic, R.string.cards),
+    BottomNavItem(ScreenRoute.MyCard.route, R.drawable.card_ic, R.string.cards),
     BottomNavItem(ScreenRoute.Transactions.route, R.drawable.transaction_ic, R.string.transactions)
 )
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppBaseTopBar(
